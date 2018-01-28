@@ -1,0 +1,54 @@
+{
+  "variables": {
+      "esxi_host": "{{env `ESXI_HOST`}}",
+      "esxi_datastore": "{{env `ESXI_DATASTORE`}}",
+      "esxi_username": "{{env `ESXI_USERNAME`}}",
+      "esxi_password": "{{env `ESXI_PASSWORD`}}"
+  },
+  "builders": [
+    {
+      "name": "centos-7-base",
+      "vm_name": "packer-centos-7-x86_64",
+      "type": "vmware-iso",
+      "communicator": "ssh",
+      "ssh_pty": "true",
+      "headless": true,
+      "disk_size": 8192,
+      "guest_os_type": "rhel7-64",
+      "iso_urls": [
+          "./iso/CentOS-7-x86_64-Minimal-1708.iso",
+          "http://mirrors.ocf.berkeley.edu/centos/7/isos/x86_64/CentOS-7-x86_64-Minimal-1708.iso",
+      ],
+      "iso_checksum": "bba314624956961a2ea31dd460cd860a77911c1e0a56e4820a12b9c5dad363f5",
+      "iso_checksum_type": "sha256",
+      "shutdown_command": "sudo -S /usr/sbin/shutdown -h now",
+      "remote_host": "{{user `esxi_host`}}",
+      "remote_datastore": "{{user `esxi_datastore`}}",
+      "remote_username": "{{user `esxi_username`}}",
+      "remote_password": "{{user `esxi_password`}}",
+      "remote_type": "esx5",
+      "format": "ovf",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_wait_timeout": "15m",
+      "tools_upload_flavor": "linux",
+      "vnc_disable_password": true,
+      "keep_registered": true,
+      "http_directory": ".",
+      "boot_wait": "7s",
+      "vmx_data": {
+         "ethernet0.networkName": "VM Network"
+      },
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/scripts/centos-7-kickstart.cfg<enter><wait>"
+      ]
+    }
+  ],
+  "provisioners": [
+    {
+      "type": "shell",
+      "scripts": ["scripts/centos-7-vmware-tools_install.sh"],
+      "execute_command": "echo 'vagrant' | {{ .Vars }} sudo -E -S bash '{{ .Path }}'"
+    }
+  ]
+}
