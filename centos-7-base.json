@@ -7,7 +7,7 @@
   },
   "builders": [
     {
-      "name": "centos-7-base",
+      "name": "packer-centos-7-x86_64",
       "vm_name": "packer-centos-7-x86_64",
       "type": "vmware-iso",
       "communicator": "ssh",
@@ -47,7 +47,7 @@
   "provisioners": [
     {
       "type": "shell",
-      "scripts": ["scripts/centos-7-vmware-tools_install.sh"],
+      "script": "scripts/centos-7-vmware-tools_install.sh",
       "execute_command": "echo 'vagrant' | {{ .Vars }} sudo -E -S bash '{{ .Path }}'"
     }
   ]
